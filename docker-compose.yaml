@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  database:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./schema/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    env_file:
+      - .env
+
+volumes:
+  data:
+
+#volumes:
+#  db:
+#    name: db
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: /home/lpeggy/data/db
+#      o: bind
+#networks:
+#  inception_custom:
+#    name: custom
+#    driver: bridge
