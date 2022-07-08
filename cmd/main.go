@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	cfg := config.NewConfig()
+	cfg := config.NewConfig(".env")
 	db := dataStorage.NewDataStorage(cfg)
 	newApp := app.NewApp(db, cfg)
 	newApi := api.NewApi(newApp, cfg)

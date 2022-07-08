@@ -3,12 +3,14 @@ package dataStorage
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
+	"sync"
 	"urlShortener/pkg/config"
 )
 
 type DatabasePostgres struct {
 	db  *sql.DB
 	cfg *config.Config
+	mu  *sync.Mutex
 }
 
 func NewPostgres(cfg *config.Config) *DatabasePostgres {
@@ -16,6 +18,7 @@ func NewPostgres(cfg *config.Config) *DatabasePostgres {
 	return &DatabasePostgres{
 		db:  conn,
 		cfg: cfg,
+		mu:  &sync.Mutex{},
 	}
 }
 
@@ -37,18 +40,19 @@ func (engine *DatabasePostgres) PostUrl(shortUrl string, fullUrl string) (string
 	stmt := "INSERT INTO urls (short_url, full_url) VALUES ($1, $2)"
 	res, err := engine.db.Exec(stmt, shortUrl, fullUrl)
 	if err != nil {
-		engine.cfg.ErrorLog.Println(err)
+		return "", err
 	}
-	//lastId, err := res.LastInsertId()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		engine.cfg.ErrorLog.Println(err)
+		return "", err
+	}
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
 		engine.cfg.ErrorLog.Println(err)
+		return "", err
 	}
-	//log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
-	engine.cfg.InfoLog.Printf("affected = %d\n", rowCnt)
+	engine.cfg.InfoLog.Printf("Id = %d, affected = %d\n", lastId, rowCnt)
 	return shortUrl, nil
 }
 
@@ -60,4 +64,22 @@ func (engine *DatabasePostgres) GetUrl(shortUrl string) (string, error) {
 		return "", err
 	}
 	return fullUrl, nil
+}
+
+func (engine *DatabasePostgres) GetShortUrl(fullUrl string) (string, error) {
+	var shortUrl string
+	stmt := "SELECT short_url FROM urls WHERE full_url=$1"
+	err := engine.db.QueryRow(stmt, fullUrl).Scan(&shortUrl)
+	if err != nil {
+		return "", err
+	}
+	return shortUrl, nil
+}
+
+func (engine *DatabasePostgres) Lock() {
+	engine.mu.Lock()
+}
+
+func (engine *DatabasePostgres) Unlock() {
+	engine.mu.Unlock()
 }

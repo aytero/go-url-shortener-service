@@ -15,11 +15,11 @@ type Config struct {
 	DatabaseUrl string
 }
 
-func NewConfig() *Config {
+func NewConfig(envFile string) *Config {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load(envFile)
 	if err != nil {
-		panic("Failed loading environment file\n")
+		panic("Failed loading environment file")
 	}
 	cfg := &Config{
 		InfoLog:     log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),

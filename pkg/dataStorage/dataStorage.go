@@ -7,6 +7,9 @@ import (
 type DatabaseMethodHandler interface {
 	GetUrl(shortUrl string) (string, error)
 	PostUrl(shortUrl string, fullUrl string) (string, error)
+	GetShortUrl(fullUrl string) (string, error)
+	Lock()
+	Unlock()
 }
 
 type Database struct {

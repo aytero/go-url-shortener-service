@@ -3,32 +3,46 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"net/url"
 	"urlShortener/pkg/model"
 )
 
-//curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"short_url":"abb","full_url":"http//:example.com/dddddddfs"}'
+//curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"short_url":"abb","full_url":"http://example.com/dddddddfs"}'
 //curl http://localhost:8080/abb
 
 func (a *Api) PostUrl(c *gin.Context) {
 	var request model.PostUrl
 
 	if err := c.BindJSON(&request); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Internal server error"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		return
+	}
+	_, err := url.ParseRequestURI(request.FullUrl)
+	if err != nil {
+		a.cfg.ErrorLog.Println(err)
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error":   "Bad request",
+			"message": "Invalid URL",
+		})
 		return
 	}
 	shortUrl, err := a.app.ShortenUrl(request.FullUrl)
+	//if errors.Is(err, "")
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Internal server error"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Internal server error"})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, shortUrl)
+	c.IndentedJSON(http.StatusCreated, gin.H{
+		"message":   "Success",
+		"short_url": shortUrl,
+	})
 }
 
-func (a *Api) GetOrigUrlByShort(c *gin.Context) {
+func (a *Api) GetFullUrlByShort(c *gin.Context) {
 	shortUrl := c.Param("shortUrl")
 
 	if shortUrl == "" {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Internal server error"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
 		return
 	}
 	fullUrl, err := a.app.GetFullUrl(shortUrl)

@@ -22,7 +22,7 @@ func (a *Api) NewRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	//router := gin.New()
-	router.GET("/:shortUrl", a.GetOrigUrlByShort)
+	router.GET("/:shortUrl", a.GetFullUrlByShort)
 	router.POST("/", a.PostUrl)
 	//router.GET("/swagger", httpSwagger)
 	return router

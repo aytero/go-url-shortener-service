@@ -2,7 +2,6 @@ package app
 
 import (
 	"math/rand"
-	"net/url"
 )
 
 const (
@@ -25,37 +24,41 @@ func (ap *App) makeHash() string {
 }
 
 func (ap *App) ShortenUrl(fullUrl string) (string, error) {
-	_, err := url.ParseRequestURI(fullUrl)
+	ap.db.Lock()
+	foundEntry, err := ap.db.GetShortUrl(fullUrl)
+	ap.db.Unlock()
+	if err == nil {
+		ap.cfg.InfoLog.Println("Url already exists")
+		return foundEntry, nil
+	}
+	shortUrl := ap.makeHash()
+	unique := false
+	ap.db.Lock()
+	for !unique {
+		foundEntry, err = ap.db.GetUrl(shortUrl)
+		if err != nil {
+			unique = true
+		}
+		shortUrl = ap.makeHash()
+	}
+	ap.db.Unlock()
+
+	ap.db.Lock()
+	_, err = ap.db.PostUrl(shortUrl, fullUrl)
+	ap.db.Unlock()
 	if err != nil {
 		ap.cfg.ErrorLog.Println(err)
 		return "", err
 	}
-	//foundEntry := ap.db.SearchFullUrl(fullUrl)
-	//if foundEntry != nil {
-	//	ap.cfg.InfoLog.Println("Url already exists")
-	//	return foundEntry.ShortUrl, nil
-	//}
-	shortUrl := ap.makeHash()
-	//foundEntry = ap.db.SearchShortUrl(shortUrl)
-	//// do in a loop
-	//if foundEntry != nil {
-	//	ap.cfg.InfoLog.Println("Url hash collision")
-	//	shortUrl = fixHashCollision()
-	//}
-
-	_, err = ap.db.PostUrl(shortUrl, fullUrl)
-	if err != nil {
-		//ap.cfg.ErrorLog.Println("Failed to insert value in the database")
-		return "", err
-	}
-	// cut prefix when search in db
 	return ap.cfg.UrlHost + shortUrl, nil
 }
 
 func (ap *App) GetFullUrl(shortUrl string) (string, error) {
-	fullUrl, err := ap.db.GetUrl(shortUrl[len(ap.cfg.UrlHost):])
+	ap.db.Lock()
+	fullUrl, err := ap.db.GetUrl(shortUrl)
+	ap.db.Unlock()
 	if err != nil {
-		//ap.cfg.ErrorLog.Println("Failed to find value in the database")
+		ap.cfg.ErrorLog.Println(err)
 		return "", err
 	}
 	return fullUrl, nil

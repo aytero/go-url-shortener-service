@@ -1,6 +1,8 @@
 package dataStorage
 
 import (
+	"errors"
+	"sync"
 	"urlShortener/pkg/config"
 	"urlShortener/pkg/model"
 )
@@ -10,6 +12,7 @@ import (
 type DatabaseLocal struct {
 	db  []model.DbEntry
 	cfg *config.Config
+	mu  *sync.Mutex
 }
 
 func NewLocalStorage(cfg *config.Config) *DatabaseLocal {
@@ -17,11 +20,9 @@ func NewLocalStorage(cfg *config.Config) *DatabaseLocal {
 	return &DatabaseLocal{
 		db:  db,
 		cfg: cfg,
+		mu:  &sync.Mutex{},
 	}
 }
-
-//{ShortUrl: "aaa", FullUrl: "example.com/aaafds"},
-//{ShortUrl: "aab", FullUrl: "example.com/aaetccsa"},
 
 func InitLocalStorage() ([]model.DbEntry, error) {
 	return []model.DbEntry{}, nil
@@ -39,5 +40,22 @@ func (engine *DatabaseLocal) GetUrl(shortUrl string) (string, error) {
 			return a.FullUrl, nil
 		}
 	}
-	return "", nil
+	return "", errors.New("not found")
+}
+
+func (engine *DatabaseLocal) GetShortUrl(fullUrl string) (string, error) {
+	for _, a := range engine.db {
+		if a.FullUrl == fullUrl {
+			return a.ShortUrl, nil
+		}
+	}
+	return "", errors.New("not found")
+}
+
+func (engine *DatabaseLocal) Lock() {
+	engine.mu.Lock()
+}
+
+func (engine *DatabaseLocal) Unlock() {
+	engine.mu.Unlock()
 }
