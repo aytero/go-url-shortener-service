@@ -1,10 +1,10 @@
-package dataStorage
+package storage
 
 import (
 	"errors"
+	"github.com/aytero/ozon-fintech-url-service/pkg/config"
+	"github.com/aytero/ozon-fintech-url-service/pkg/model"
 	"sync"
-	"urlShortener/pkg/config"
-	"urlShortener/pkg/model"
 )
 
 // need Mutex

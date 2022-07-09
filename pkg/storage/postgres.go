@@ -1,10 +1,10 @@
-package dataStorage
+package storage
 
 import (
 	"database/sql"
+	"github.com/aytero/ozon-fintech-url-service/pkg/config"
 	_ "github.com/lib/pq"
 	"sync"
-	"urlShortener/pkg/config"
 )
 
 type DatabasePostgres struct {
@@ -27,32 +27,15 @@ func InitPostgres(cfg *config.Config) (*sql.DB, error) {
 	if err != nil {
 		cfg.ErrorLog.Fatalf("Unable to connect to database: %v\n", err)
 	}
-	//defer conn.Close()
-
-	//err = conn.Ping()
-	//if err != nil {
-	//	return nil, err
-	//}
 	return conn, nil
 }
 
 func (engine *DatabasePostgres) PostUrl(shortUrl string, fullUrl string) (string, error) {
 	stmt := "INSERT INTO urls (short_url, full_url) VALUES ($1, $2)"
-	res, err := engine.db.Exec(stmt, shortUrl, fullUrl)
+	_, err := engine.db.Exec(stmt, shortUrl, fullUrl)
 	if err != nil {
 		return "", err
 	}
-	lastId, err := res.LastInsertId()
-	if err != nil {
-		engine.cfg.ErrorLog.Println(err)
-		return "", err
-	}
-	rowCnt, err := res.RowsAffected()
-	if err != nil {
-		engine.cfg.ErrorLog.Println(err)
-		return "", err
-	}
-	engine.cfg.InfoLog.Printf("Id = %d, affected = %d\n", lastId, rowCnt)
 	return shortUrl, nil
 }
 

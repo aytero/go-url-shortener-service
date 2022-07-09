@@ -20,17 +20,18 @@
   
 ## Запуск
 
-Для запуска с in-memory хранилищем данных:
+**Для запуска с in-memory хранилищем данных:**
 ```sh
 go run cmd/main.go -storage=local
 
 OR
 
-docker build -t service .
+docker build -f Dockerfile.local -t service .
 docker run -p 8080:8080 -t service
 ```
+<br>
 
-Для запуска с PostgreSQL:
+**Для запуска с PostgreSQL:**
 ```sh
 go run cmd/main.go -storage=postgres
 
@@ -39,6 +40,44 @@ OR
 docker-compose up --build
 ```
 В случае запуска без Docker'а необходимо использовать в **.env**-файле `DATABASE_URL=postgres://localhost:qwer@database:5432/urlsdb?sslmode=disable`
+<br>
+<br>
+
+**Запуск Unit-тестов:**
+```sh
+go test ./...
+```
+
+## Пример хэширования и занесения URL в базу
+### Request
+```
+curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"full_url":"https://example.com/ddddddddk/share/fs"}'
+```
+<br>
+
+### Response
+```
+{
+    "message": "Success",
+    "short_url": "https://short.io/ddZ7Vg7jFR"
+}
+```
+<br>
+
+## Пример получения оригинальной URL из базы
+### Request
+```
+curl https://localhost:8080/ddZ7Vg7jFR
+```
+<br>
+
+### Response
+```
+{
+   "full_url": "https://example.com/dddddddfs"
+}
+```
+<br>
 
 ## Алгоритм создания коротких ссылок
 Для создания используется Base string с разрешёнными символами, которые выдираются случайным образом. 

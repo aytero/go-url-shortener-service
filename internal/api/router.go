@@ -1,9 +1,9 @@
 package api
 
 import (
+	"github.com/aytero/ozon-fintech-url-service/internal/app"
+	"github.com/aytero/ozon-fintech-url-service/pkg/config"
 	"github.com/gin-gonic/gin"
-	"urlShortener/internal/app"
-	"urlShortener/pkg/config"
 )
 
 type Api struct {
@@ -21,9 +21,15 @@ func NewApi(app *app.App, cfg *config.Config) *Api {
 func (a *Api) NewRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	//router := gin.New()
 	router.GET("/:shortUrl", a.GetFullUrlByShort)
 	router.POST("/", a.PostUrl)
-	//router.GET("/swagger", httpSwagger)
 	return router
 }
+
+//server := &http.Server{
+//	Addr:           ":8080",
+//	Handler:        mux,
+//	ReadTimeout:    10 * time.Second,
+//	WriteTimeout:   10 * time.Second,
+//	MaxHeaderBytes: 1 << 20,
+//}

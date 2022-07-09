@@ -8,4 +8,4 @@ RUN go build -o app ./cmd/main.go
 
 EXPOSE  8080
 
-CMD		["./app", "-dbType=postgres"]
+CMD		["./app", "-storage=postgres"]

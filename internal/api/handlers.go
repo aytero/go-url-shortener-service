@@ -1,14 +1,11 @@
 package api
 
 import (
+	"github.com/aytero/ozon-fintech-url-service/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
-	"urlShortener/pkg/model"
 )
-
-//curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"short_url":"abb","full_url":"http://example.com/dddddddfs"}'
-//curl http://localhost:8080/abb
 
 func (a *Api) PostUrl(c *gin.Context) {
 	var request model.PostUrl
@@ -27,7 +24,6 @@ func (a *Api) PostUrl(c *gin.Context) {
 		return
 	}
 	shortUrl, err := a.app.ShortenUrl(request.FullUrl)
-	//if errors.Is(err, "")
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Internal server error"})
 		return
@@ -51,6 +47,6 @@ func (a *Api) GetFullUrlByShort(c *gin.Context) {
 	} else if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Internal server error"})
 	}
-	c.IndentedJSON(http.StatusOK, fullUrl)
+	c.IndentedJSON(http.StatusOK, gin.H{"full_url": fullUrl})
 
 }

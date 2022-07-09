@@ -1,18 +1,18 @@
 package app
 
 import (
+	"github.com/aytero/ozon-fintech-url-service/pkg/config"
+	"github.com/aytero/ozon-fintech-url-service/pkg/storage"
 	"math/rand"
 	"time"
-	"urlShortener/pkg/config"
-	"urlShortener/pkg/dataStorage"
 )
 
 type App struct {
-	db  *dataStorage.Database
+	db  *storage.Database
 	cfg *config.Config
 }
 
-func NewApp(db *dataStorage.Database, cfg *config.Config) *App {
+func NewApp(db *storage.Database, cfg *config.Config) *App {
 	rand.Seed(time.Now().UnixNano())
 	return &App{
 		db:  db,

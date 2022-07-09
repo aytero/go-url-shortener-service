@@ -24,14 +24,14 @@ func NewConfig(envFile string) *Config {
 	cfg := &Config{
 		InfoLog:     log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
 		ErrorLog:    log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		StorageType: getDbType(),
+		StorageType: getStorageType(),
 		UrlHost:     os.Getenv("URL_HOST"),
 		DatabaseUrl: os.Getenv("DATABASE_URL"),
 	}
 	return cfg
 }
 
-func getDbType() string {
+func getStorageType() string {
 	var dbFromFlag string
 
 	flag.StringVar(&dbFromFlag, "storage", "local", "type of storage: postgres or local")

@@ -1,7 +1,8 @@
-package dataStorage
+package storage
 
 import (
-	"urlShortener/pkg/config"
+	"errors"
+	"github.com/aytero/ozon-fintech-url-service/pkg/config"
 )
 
 type DatabaseMethodHandler interface {
@@ -17,21 +18,22 @@ type Database struct {
 	DatabaseMethodHandler
 }
 
-func NewDataStorage(cfg *config.Config) *Database {
+func NewStorage(cfg *config.Config) (*Database, error) {
 	switch cfg.StorageType {
 	case "postgres":
 		return &Database{
 			cfg:                   cfg,
 			DatabaseMethodHandler: NewPostgres(cfg),
-		}
+		}, nil
 	case "local":
 		return &Database{
 			cfg:                   cfg,
 			DatabaseMethodHandler: NewLocalStorage(cfg),
-		}
+		}, nil
 	default:
-		cfg.ErrorLog.Fatalf(
-			"Unknown data storage type. Expected: 'postgres' or 'local'. Usage: go run cmd/main.gp -storage=postgres")
+		return &Database{
+			cfg:                   cfg,
+			DatabaseMethodHandler: NewLocalStorage(cfg),
+		}, errors.New("Unknown data storage type. Expected: 'postgres' or 'local'. Usage: go run cmd/main.gp -storage=postgres")
 	}
-	return nil
 }

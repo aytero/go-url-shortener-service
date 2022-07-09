@@ -26,15 +26,7 @@ services:
 volumes:
   data:
 
-#volumes:
-#  db:
-#    name: db
-#    driver: local
-#    driver_opts:
-#      type: none
-#      device: /home/lpeggy/data/db
-#      o: bind
 #networks:
-#  inception_custom:
+#  netcustom:
 #    name: custom
 #    driver: bridge
