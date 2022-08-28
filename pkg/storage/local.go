@@ -2,8 +2,8 @@ package storage
 
 import (
 	"errors"
-	"github.com/aytero/ozon-fintech-url-service/pkg/config"
-	"github.com/aytero/ozon-fintech-url-service/pkg/model"
+	"github.com/aytero/go-url-shortener-service/pkg/config"
+	"github.com/aytero/go-url-shortener-service/pkg/model"
 	"sync"
 )
 

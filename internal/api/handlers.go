@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/aytero/ozon-fintech-url-service/pkg/model"
+	"github.com/aytero/go-url-shortener-service/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"

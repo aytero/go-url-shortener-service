@@ -1,4 +1,4 @@
-module github.com/aytero/ozon-fintech-url-service
+module github.com/aytero/go-url-shortener-service
 
 go 1.19
 

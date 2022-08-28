@@ -2,7 +2,7 @@ package storage
 
 import (
 	"database/sql"
-	"github.com/aytero/ozon-fintech-url-service/pkg/config"
+	"github.com/aytero/go-url-shortener-service/pkg/config"
 	_ "github.com/lib/pq"
 	"sync"
 )
